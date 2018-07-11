@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Silver Line Time Schedule!</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+  <div class="container">
+      <div class = "jumbotron jumbotron-fluid text-center" style = "background-color:#3B5323; color:azure;"> 
+              <h1>Train Schedule Checker</h1>
+      </div>
+      <div id = "input" style = "color:#3B5323;">
+              <h2>Add Train</h2>  
+                  
+                      <form id = "trainForm" style = "color:#3B5323;">
+                          <label for = "train-num"> Train Number</label>
+                          <input type = "text" id="train-num">
+                          <br>
+                          <label for = "train-destination"> Train Destination</label>
+                          <input type = "text" id="train-destination">
+                          <br>
+                          <label for = "frequency"> Frequency</label>
+                          <input type = "text" id="frequency">
+                          <br>
+                          <label for = "first-train"> First Train (HH:mm - MILITARY TIME ONLY)</label>
+                          <input type = "text" id="first-train">
+                          <br>
+                          <br>
+                          <input id = "addTrain" type="submit" value = "Submit" style="color: #3B5323">
+      
+      
+                      </form>
+      
+                      <br>
+                      <br>
+      
+              </div>
+
+      <div id = "records">
+       <h2 style = "color:#3B5323;">TRAIN SCHEDULE</h2>      
+
+       <table class="table text-center" style = "color:#3B5323;">
+              <thead>
+                <tr>
+                  <th scope="col">Train Number</th>
+                  <th scope="col">Destination</th>
+                  <th scope="col">Minutes Away</th>
+                  <th scope="col">Arrival Time</th>
+                  <th scope="col">Departure Time</th>
+                </tr>
+              </thead>
+              <tbody>
+               
+              </tbody>
+      </table>
+
+
+      </div>
+      <br>
+      <br>
+      
+
+
+  </div>
+  
+
+
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery.js"></script>
+
+  <!-- Script -->
+<!-- LINK TO FIREBASE GOES HERE -->
+<script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+
+   <script>
+
+   // Initialize Firebase
+   var config = {
+    apiKey: "AIzaSyCj7o8z4W7nyaWd_poJbDDt2stwNWaIJPk",
+    authDomain: "silverlineproject-f8c21.firebaseapp.com",
+    databaseURL: "https://silverlineproject-f8c21.firebaseio.com",
+    projectId: "silverlineproject-f8c21",
+    storageBucket: "",
+    messagingSenderId: "596274034431"
+  };
+  firebase.initializeApp(config); 
+      var database = firebase.database();
+      // Create a variable to reference the database
+      var trainNum = "";
+      var destination = "";
+      var frequency = 0;
+      var firstTrain = "00:00";
+
+      // Capture Button Click
+      $("#addTrain").on("click", function(event) {
+      // Don't refresh the page!
+        event.preventDefault();
+
+        // YOUR TASK!!!
+        var frequency = 0;
+        // Code in the logic for storing and retrieving the most recent user.
+        trainNum = $("#train-num").val();
+        destination = $("#train-destination").val();
+        frequency = $("#frequency").val();
+        firstTrain = $("#first-train").val();
+        
+        database.ref().push({
+            trainNum: trainNum,
+            destination: destination,
+            frequency: frequency,
+            firstTrain: firstTrain,
+            dateAdded: firebase.database.ServerValue.TIMESTAMP
+        });
+      
+      }); 
+    
+  database.ref().on("child_added", function(snapshot) {
+      console.log(snapshot.val().trainNum);
+      console.log(snapshot.val().destination);
+      var createRow = function() {
+    
+      var tBody = $("tbody");
+      var tRow = $("<tr>");
+      
+      var trainNum = $("<td>").text(snapshot.val().trainNum);
+      var destination = $("<td>").text(snapshot.val().destination);
+      var frequency = snapshot.val().frequency; //ok returns number
+      var firstTime = snapshot.val().firstTrain; //returns correct first time 
+       
+      var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+      console.log(firstTimeConverted);
+      
+      // Current Time
+      var currentTime = moment();
+      console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+      // Difference between the times
+      var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+      console.log("DIFFERENCE IN TIME: " + diffTime);
+      // Time apart (remainder)
+      var tRemainder = diffTime % frequency;
+      console.log(tRemainder); // working
+      // Minute Until Train
+      var tMinutesTillTrain =  $("<td>").text(frequency - tRemainder);
+      console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+      // Next Train
+      var nextTrain =  $("<td>").text((moment().add(tMinutesTillTrain, "minutes")).format('LT'));
+      // console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+      
+      var departureTime = $("<td>").text(moment().add((tMinutesTillTrain+5), "minutes").format('LT'));
+      console.log("departure TIME: " + moment(departureTime).format("hh:mm"));
+
+      tRow.append(trainNum,destination,tMinutesTillTrain,nextTrain,departureTime);
+      
+      tBody.append(tRow);
+ 
+
+
+  };
+
+      createRow();
+
+      });
+
+    // var train400 = [
+    //     { 
+    //       "Belmont": {
+    //         "Arrival in minutes": tMinutesTillTrainBelmont,
+    //         "Arrival Time": moment(nextTrain).format("hh:mm"),
+    //         "Departure Time":  moment(departureTime).format("hh:mm"),
+    //       }, 
+    //       "Hyde Park": {
+    //         "Arrival in minutes": tHydePark,
+    //         "Arrival Time": moment(nextTrainHydePark).format("hh:mm"),
+    //         "Departure": moment(departureTimeHydePark).format("hh:mm"),
+    //       }, 
+    //       "Block 37": {
+    //         "Arrival in minutes": tBlock37,
+    //         "Arrival Time": moment(nextTrainBlock37).format("hh:mm"),
+    //         "Departure Time": moment(departureTimeBlock37).format("hh:mm"),
+    //     },
+    //     }];
+
+    // console.log
+    //   for (i=0;i<train400.length;i++) {
+    //     console.log(train400[i]);
+    //   }
+  
+  </script>   
+
+     
+
+
+
+
+
+
+
+  
+
+</body>
+
+</html>
