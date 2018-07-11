@@ -138,15 +138,19 @@
       var tRemainder = diffTime % frequency;
       // console.log(tRemainder); // working
       // Minute Until Train
-      var tMinutesTillTrain =  (frequency - tRemainder);
+      var tMinutesTillTrain =  frequency - tRemainder;
       var minAway = $("<td>").text(tMinutesTillTrain);
       // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+  
       // Next Train
-      var nextTrain =  $("<td>").text((moment().add(tMinutesTillTrain, "minutes")).format('LT'));
-      // console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+    
+      var nextTrainpre = moment().add(tMinutesTillTrain, "minutes");
+      // console.log("next train: " + nextTrainpre.format('LT'));
+      var nextTrain =  $("<td>").text(nextTrainpre.format('LT'));
+      // console.log("ARRIVAL TIME: " + moment(nextTrain).format('LT')); // wrong
       
       var departureTime = $("<td>").text(moment().add((tMinutesTillTrain+5), "minutes").format('LT'));
-      // console.log("departure TIME: " + moment(departureTime).format("hh:mm"));
+      // console.log("departure TIME: " + moment(departureTime).format("hh:mm")); //wrong
 
       tRow.append(trainNum,destination,minAway,nextTrain,departureTime);
       
@@ -161,8 +165,7 @@
   setInterval(function(){
     location.reload();
   }, 60000)
-
-  
+ 
 </script>   
 </body>
 </html>
