@@ -9,7 +9,11 @@
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-
+<style>
+  .nextTrain {
+    color:orange;
+  }
+</style>
 </head>
 
 <body>
@@ -23,16 +27,16 @@
                   
       <form id = "trainForm" style = "color:#3B5323;">
         <label for = "train-num"> Train Number</label>
-        <input type = "text" id="train-num">
+        <input type = "text" id="train-num" required>
         <br>
         <label for = "train-destination"> Train Destination</label>
-        <input type = "text" id="train-destination">
+        <input type = "text" id="train-destination" required>
         <br>
         <label for = "frequency"> Frequency</label>
-        <input type = "text" id="frequency">
+        <input type = "text" id="frequency" required>
         <br>
         <label for = "first-train"> First Train (HH:mm - MILITARY TIME ONLY)</label>
-        <input type = "text" id="first-train">
+        <input type = "text" id="first-train" required>
         <br>
         <br>
         <input id = "addTrain" type="submit" value = "Submit" style="color: #3B5323">
@@ -141,7 +145,10 @@
       var tMinutesTillTrain =  frequency - tRemainder;
       var minAway = $("<td>").text(tMinutesTillTrain);
       // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
-  
+      // CHANGE COLOR OF TEXT WHEN TRAIN IS CLOSE
+       if (tMinutesTillTrain<4){
+         minAway.addClass("nextTrain");
+       } 
       // Next Train
     
       var nextTrainpre = moment().add(tMinutesTillTrain, "minutes");
@@ -163,9 +170,10 @@
   });
 
   setInterval(function(){
+
     location.reload();
   }, 60000)
- 
+
 </script>   
 </body>
 </html>
