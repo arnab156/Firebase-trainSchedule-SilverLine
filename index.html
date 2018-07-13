@@ -10,10 +10,10 @@
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 <style>
-  .nextTrain {
+  /* .nextTrain {
     color:orange;
     font-size: 20px;
-  }
+  } */
   .jumbotron{
    position: relative;
    overflow: hidden;
@@ -58,16 +58,16 @@
                   
       <form id = "trainForm" style = "color:#3B5323;">
         <label for = "train-num"> Train Number</label>
-        <input type = "text" id="train-num" required>
+        <input type = "text" id="train-num">
         <br>
         <label for = "train-destination"> Train Destination</label>
-        <input type = "text" id="train-destination" required>
+        <input type = "text" id="train-destination">
         <br>
         <label for = "frequency"> Frequency</label>
-        <input type = "text" id="frequency" required>
+        <input type = "text" id="frequency">
         <br>
         <label for = "first-train"> First Train (HH:mm - MILITARY TIME ONLY)</label>
-        <input type = "text" id="first-train" required>
+        <input type = "text" id="first-train">
         <br>
         <br>
         <input id = "addTrain" type="submit" value = "Submit" style="color: #3B5323">
@@ -143,11 +143,12 @@
             firstTrain: firstTrain,
             dateAdded: firebase.database.ServerValue.TIMESTAMP
         });
-      
+        // $("#train-num").val = "";
       }); 
     
   database.ref().on("child_added", function(snapshot) {
-      console.log(snapshot.val().trainNum);
+      console.log(snapshot.val());
+      console.log(snapshot.key);
       console.log(snapshot.val().destination);
       var createRow = function() {
     
@@ -178,7 +179,7 @@
       // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
       // CHANGE COLOR OF TEXT WHEN TRAIN IS CLOSE
        if (tMinutesTillTrain<5){
-         minAway.addClass("nextTrain");
+         minAway.addClass("text-warning");
        } 
       // Next Train
     
@@ -189,8 +190,17 @@
       
       var departureTime = $("<td>").text(moment().add((tMinutesTillTrain+5), "minutes").format('LT'));
       // console.log("departure TIME: " + moment(departureTime).format("hh:mm")); //wrong
-
-      tRow.append(trainNum,destination,minAway,nextTrain,departureTime);
+      var editBtn = $("<button> Edit</button>");
+      var deleteBtn = $("<button> Delete</button>");
+      editBtn.attr({
+        "class": "edit",
+        "data-id": snapshot.key,
+      });
+      deleteBtn.attr({
+        "class": "del",
+        "data-id": snapshot.key,
+      });
+      tRow.append(trainNum,destination,minAway,nextTrain,departureTime,editBtn,deleteBtn);
       
       tBody.append(tRow);
  
@@ -199,6 +209,32 @@
   createRow();
 
   });
+
+  $(document).on("click", ".edit", function(){
+    var id  = $(this)[0].dataset.id;
+    var trainNum = prompt ("enter train") ;
+    var destination = prompt ("enter new destination");
+    var frequency = prompt("new fre");
+    var firstTrain = prompt("military time ");
+    
+    editTrain(id,trainNum,destination,frequency,firstTrain);
+  })
+
+  function editTrain (id,trainNum,destination,frequency,firstTrain){
+    database.ref("id").set({
+              trainNum: trainNum,
+              destination: destination,
+              frequency: frequency,
+              firstTrain: firstTrain
+      })
+    location.reload();
+}
+
+  $(document).on("click", ".del", function(){
+    var id  = $(this)[0].dataset.id;
+    database.ref(id).remove();
+    location.reload();
+  })
 
   setInterval(function(){
 
