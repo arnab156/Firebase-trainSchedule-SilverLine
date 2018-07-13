@@ -12,15 +12,46 @@
 <style>
   .nextTrain {
     color:orange;
+    font-size: 20px;
   }
+  .jumbotron{
+   position: relative;
+   overflow: hidden;
+   height: 200px;
+}
+
+.container {
+  position: relative;
+  color: #ffffff;
+  z-index: 2; /* Show content above video */
+}
+
+#video-background{ 
+  position: absolute;
+  height: auto;
+  width: auto;
+  min-height: 100%;
+  min-width: 100%;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  z-index: 1;
+}
 </style>
 </head>
 
 <body>
 
   <div class="container">
-    <div class = "jumbotron jumbotron-fluid text-center" style = "background-color:#3B5323; color:azure;"> 
-      <h1>Train Schedule Checker</h1>
+    <div class = "jumbotron jumbotron-fluid text-center" style = "background-color:#3B5323; color:azure; height:300px;"> 
+        <video id="video-background" preload muted autoplay loop>
+            <source src="silverLine.mp4" type="video/mp4">
+            <!-- <source src="http://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg"> -->
+          </video>
+        <div class="container">
+            <h1>Silver Line Schedule Checker</h1>
+          </div>
     </div>
     <div id = "input" style = "color:#3B5323;">
       <h2>Add Train</h2>  
@@ -146,7 +177,7 @@
       var minAway = $("<td>").text(tMinutesTillTrain);
       // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
       // CHANGE COLOR OF TEXT WHEN TRAIN IS CLOSE
-       if (tMinutesTillTrain<4){
+       if (tMinutesTillTrain<5){
          minAway.addClass("nextTrain");
        } 
       // Next Train
