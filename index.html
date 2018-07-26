@@ -8,37 +8,10 @@
   <title>Silver Line Time Schedule!</title>
 
   <!-- Bootstrap -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-<style>
-  /* .nextTrain {
-    color:orange;
-    font-size: 20px;
-  } */
-  .jumbotron{
-   position: relative;
-   overflow: hidden;
-   height: 200px;
-}
-
-.container {
-  position: relative;
-  color: #ffffff;
-  z-index: 2; /* Show content above video */
-}
-
-#video-background{ 
-  position: absolute;
-  height: auto;
-  width: auto;
-  min-height: 100%;
-  min-width: 100%;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate3d(-50%, -50%, 0);
-  transform: translate3d(-50%, -50%, 0);
-  z-index: 1;
-}
-</style>
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/style.css" type="text/css">
 </head>
 
 <body>
@@ -47,16 +20,15 @@
     <div class = "jumbotron jumbotron-fluid text-center" style = "background-color:#3B5323; color:azure; height:300px;"> 
         <video id="video-background" preload muted autoplay loop>
             <source src="silverLine.mp4" type="video/mp4">
-            <!-- <source src="http://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg"> -->
           </video>
         <div class="container">
             <h1>Silver Line Schedule Checker</h1>
           </div>
     </div>
-    <div id = "input" style = "color:#3B5323;">
+    <div id = "input">
       <h2>Add Train</h2>  
                   
-      <form id = "trainForm" style = "color:#3B5323;">
+      <form id = "trainForm">
         <label for = "train-num"> Train Number</label>
         <input type = "text" id="train-num">
         <br>
@@ -94,153 +66,43 @@
     </div>
     <br><br>
   </div>
-  
 
+<!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Launch demo modal
+</button> -->
+
+<!-- Modal -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>I do not want to write</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div> -->
 
 
   <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery.js"></script>
 
   <!-- Script -->
   <!-- LINK TO FIREBASE & MOMENTS JS GOES HERE -->
   <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
   <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+  <script src="assets/app.js"></script>
   <script>
-   // Initialize Firebase
-      var config = {
-      apiKey: "AIzaSyCj7o8z4W7nyaWd_poJbDDt2stwNWaIJPk",
-      authDomain: "silverlineproject-f8c21.firebaseapp.com",
-      databaseURL: "https://silverlineproject-f8c21.firebaseio.com",
-      projectId: "silverlineproject-f8c21",
-      storageBucket: "",
-      messagingSenderId: "596274034431"
-    };
-  firebase.initializeApp(config); 
-    var database = firebase.database();
-    // Create a variable to reference the database
-    var trainNum = "";
-    var destination = "";
-    var frequency = 0;
-    var firstTrain = "00:00";
+  </script>
 
-      // Capture Button Click
-      $("#addTrain").on("click", function(event) {
-      // Don't refresh the page!
-        event.preventDefault();
-
-        // YOUR TASK!!!
-        var frequency = 0;
-        // Code in the logic for storing and retrieving the most recent user.
-        trainNum = $("#train-num").val();
-        destination = $("#train-destination").val();
-        frequency = $("#frequency").val();
-        firstTrain = $("#first-train").val();
-        
-        database.ref().push({
-            trainNum: trainNum,
-            destination: destination,
-            frequency: frequency,
-            firstTrain: firstTrain,
-            dateAdded: firebase.database.ServerValue.TIMESTAMP
-        });
-        // $("#train-num").val = "";
-      }); 
-    
-  database.ref().on("child_added", function(snapshot) {
-      console.log(snapshot.val());
-      console.log(snapshot.key);
-      console.log(snapshot.val().destination);
-      var createRow = function() {
-    
-      var tBody = $("tbody");
-      var tRow = $("<tr>");
-      
-      var trainNum = $("<td>").text(snapshot.val().trainNum);
-      var destination = $("<td>").text(snapshot.val().destination);
-      var frequency = snapshot.val().frequency; //ok returns number
-      var firstTime = snapshot.val().firstTrain; //returns correct first time 
-       
-      var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
-      // console.log(firstTimeConverted);
-      
-      // Current Time
-      var currentTime = moment();
-      // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
-
-      // Difference between the times
-      var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-      // console.log("DIFFERENCE IN TIME: " + diffTime);
-      // Time apart (remainder)
-      var tRemainder = diffTime % frequency;
-      // console.log(tRemainder); // working
-      // Minute Until Train
-      var tMinutesTillTrain =  frequency - tRemainder;
-      var minAway = $("<td>").text(tMinutesTillTrain);
-      // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
-      // CHANGE COLOR OF TEXT WHEN TRAIN IS CLOSE
-       if (tMinutesTillTrain<5){
-         minAway.addClass("text-warning");
-       } 
-      // Next Train
-    
-      var nextTrainpre = moment().add(tMinutesTillTrain, "minutes");
-      // console.log("next train: " + nextTrainpre.format('LT'));
-      var nextTrain =  $("<td>").text(nextTrainpre.format('LT'));
-      // console.log("ARRIVAL TIME: " + moment(nextTrain).format('LT')); // wrong
-      
-      var departureTime = $("<td>").text(moment().add((tMinutesTillTrain+5), "minutes").format('LT'));
-      // console.log("departure TIME: " + moment(departureTime).format("hh:mm")); //wrong
-      var editBtn = $("<button> Edit</button>");
-      var deleteBtn = $("<button> Delete</button>");
-      editBtn.attr({
-        "class": "edit",
-        "data-id": snapshot.key,
-      });
-      deleteBtn.attr({
-        "class": "del",
-        "data-id": snapshot.key,
-      });
-      tRow.append(trainNum,destination,minAway,nextTrain,departureTime,editBtn,deleteBtn);
-      
-      tBody.append(tRow);
- 
-  };
-
-  createRow();
-
-  });
-
-  $(document).on("click", ".edit", function(){
-    var id  = $(this)[0].dataset.id;
-    var trainNum = prompt ("enter train") ;
-    var destination = prompt ("enter new destination");
-    var frequency = prompt("new fre");
-    var firstTrain = prompt("military time ");
-    
-    editTrain(id,trainNum,destination,frequency,firstTrain);
-  })
-
-  function editTrain (id,trainNum,destination,frequency,firstTrain){
-    database.ref("id").set({
-              trainNum: trainNum,
-              destination: destination,
-              frequency: frequency,
-              firstTrain: firstTrain
-      })
-    location.reload();
-}
-
-  $(document).on("click", ".del", function(){
-    var id  = $(this)[0].dataset.id;
-    database.ref(id).remove();
-    location.reload();
-  })
-
-  setInterval(function(){
-
-    location.reload();
-  }, 60000)
-
-</script>   
 </body>
 </html>
